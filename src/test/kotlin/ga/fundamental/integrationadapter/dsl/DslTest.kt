@@ -1,17 +1,17 @@
 package ga.fundamental.integrationadapter.dsl
 
-import ga.fundamental.integrationadapter.components.Message
-import ga.fundamental.integrationadapter.components.TestProcessor1
+import ga.fundamental.integrationadapter.components.LetterCounter
+import ga.fundamental.integrationadapter.components.SimpleMapper
 import ga.fundamental.integrationadapter.dsl.Router.router
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 class DslTest {
 
-    val processor1 = TestProcessor1<Message>()
-    val processor2 = TestProcessor1<Message>()
-    val processor3 = TestProcessor1<Message>()
-    val processor4 = TestProcessor1<Message>()
+    val processor1 = SimpleMapper()
+    val processor2 = LetterCounter()
+    val processor3 = SimpleMapper()
+    val processor4 = LetterCounter()
 
     @Test
     fun test() {
