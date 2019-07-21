@@ -11,3 +11,13 @@ interface Component {
 interface ReactiveComponent<T> : Component {
     fun setEventBus(fluxProcessor: FluxProcessor<T, T>)
 }
+
+interface Source<T> : ReactiveComponent<T> {
+    fun publishEvent(event: T)
+}
+
+interface Sink<T> : ReactiveComponent<T> {
+    fun subscribeToEvents()
+}
+
+interface Processor<T> : Source<T>, Sink<T>

@@ -16,7 +16,11 @@ abstract class AbstractFluxProcessor : Processor<Message> {
         this.nextDestinationName = destinationName
     }
 
-    override fun process(obj: Message) {
+    override fun publishEvent(event: Message) {
+        fluxProcessor.onNext(event.apply { destination = nextDestinationName })
+    }
+
+    override fun subscribeToEvents() {
         fluxProcessor.filter { it != null }
                 .filter { it.destination == getDestination() }
                 .subscribe(
@@ -25,9 +29,8 @@ abstract class AbstractFluxProcessor : Processor<Message> {
                 )
     }
 
-
     private fun processAndPublish(message: Message) {
-        fluxProcessor.onNext(processInternal(message.apply { destination = nextDestinationName }))
+        publishEvent(processInternal(message))
     }
 
     abstract fun processInternal(message: Message): Message
