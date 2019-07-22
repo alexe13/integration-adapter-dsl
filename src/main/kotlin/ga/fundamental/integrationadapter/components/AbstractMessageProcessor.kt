@@ -2,7 +2,7 @@ package ga.fundamental.integrationadapter.components
 
 import reactor.core.publisher.FluxProcessor
 
-abstract class AbstractFluxProcessor : Processor<Message> {
+abstract class AbstractMessageProcessor : Processor<Message> {
 
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
 

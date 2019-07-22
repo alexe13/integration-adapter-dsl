@@ -1,6 +1,6 @@
 package ga.fundamental.integrationadapter.components
 
-class LetterCounter: AbstractFluxProcessor() {
+class LetterCounter: AbstractMessageProcessor() {
 
     override fun getDestination() = "letterCounter"
 
