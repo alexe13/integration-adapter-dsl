@@ -1,30 +1,30 @@
 package ga.fundamental.integrationadapter.dsl
 
-import ga.fundamental.integrationadapter.components.LetterCounter
-import ga.fundamental.integrationadapter.components.SimpleMapper
-import ga.fundamental.integrationadapter.components.StdOutReader
-import ga.fundamental.integrationadapter.dsl.Router.router
+import ga.fundamental.integrationadapter.*
+import ga.fundamental.integrationadapter.components.Message
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import reactor.core.publisher.ReplayProcessor
 
 class DslTest {
-
-    val reader1 = StdOutReader()
-    val processor2 = LetterCounter()
-    val processor3 = SimpleMapper()
-    val processor4 = LetterCounter()
+    private val replayProcessor = ReplayProcessor.create<Message>()
 
     @Test
     fun test() {
 
-        router {
-            pipeline("CB courses") {
-                link(reader1 to processor2)
-                link(processor2 to processor3)
-                link(processor3 to processor4)
+        Router {
+            pipeline("Count letters from console input") {
+                eventBus(replayProcessor)
+                components {
+                    link(stdOutReader to simpleMapper)
+                    link(simpleMapper to letterCounter)
+                    link(letterCounter to stdOutWriter)
+                }
             }
-            pipeline("RFQ request") {
-                link(processor4 to processor2)
+            pipeline("Some other processing pipeline") {
+                components {
+                    link(simpleMapper2 to letterCounter2)
+                }
             }
         }
 

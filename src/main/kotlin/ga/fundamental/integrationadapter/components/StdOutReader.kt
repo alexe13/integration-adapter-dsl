@@ -16,7 +16,7 @@ class StdOutReader : Source<Message> {
         }.start()
     }
 
-    override fun getDestination(): String = "stdOutReader"
+    override fun getOwnDestination(): String = "stdOutReader"
 
     override fun setNextDestination(destinationName: String) {
         this.nextDestinationName = destinationName

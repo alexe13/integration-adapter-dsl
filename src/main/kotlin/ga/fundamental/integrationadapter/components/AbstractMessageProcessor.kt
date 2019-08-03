@@ -8,8 +8,13 @@ abstract class AbstractMessageProcessor : Processor<Message> {
 
     private lateinit var nextDestinationName: String
 
+    private var subscribed: Boolean = false
+
     override fun setEventBus(fluxProcessor: FluxProcessor<Message, Message>) {
         this.fluxProcessor = fluxProcessor
+        if (!subscribed) {
+            subscribeToEvents()
+        }
     }
 
     override fun setNextDestination(destinationName: String) {
@@ -21,8 +26,10 @@ abstract class AbstractMessageProcessor : Processor<Message> {
     }
 
     override fun subscribeToEvents() {
+        println("${getOwnDestination()} subscribes to eventBus ${fluxProcessor.hashCode()}")
+        subscribed = true
         fluxProcessor.filter { it != null }
-                .filter { it.destination == getDestination() }
+                .filter { it.destination == getOwnDestination() }
                 .subscribe(
                         this::processAndPublish, //onNext
                         ::println              //onError

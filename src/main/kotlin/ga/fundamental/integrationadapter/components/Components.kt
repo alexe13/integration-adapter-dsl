@@ -4,7 +4,7 @@ import reactor.core.publisher.FluxProcessor
 
 
 interface Component {
-    fun getDestination(): String
+    fun getOwnDestination(): String
     fun setNextDestination(destinationName: String)
 }
 
