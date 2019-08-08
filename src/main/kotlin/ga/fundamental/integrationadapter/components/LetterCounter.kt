@@ -1,8 +1,6 @@
 package ga.fundamental.integrationadapter.components
 
-class LetterCounter: AbstractMessageProcessor() {
-
-    override fun getOwnDestination() = "letterCounter"
+class LetterCounter : AbstractMessageProcessor("letterCounter") {
 
     override fun processInternal(message: Message): Message {
         return message.copy(

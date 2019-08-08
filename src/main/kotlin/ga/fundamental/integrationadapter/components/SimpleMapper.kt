@@ -1,8 +1,6 @@
 package ga.fundamental.integrationadapter.components
 
-class SimpleMapper : AbstractMessageProcessor() {
-
-    override fun getOwnDestination() = "simpleMapper"
+class SimpleMapper : AbstractMessageProcessor("simpleMapper") {
 
     override fun processInternal(message: Message): Message {
         return message.copy(

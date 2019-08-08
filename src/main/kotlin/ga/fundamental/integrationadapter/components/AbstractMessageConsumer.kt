@@ -2,11 +2,15 @@ package ga.fundamental.integrationadapter.components
 
 import reactor.core.publisher.FluxProcessor
 
-abstract class AbstractMessageProcessor(private val componentName: String) : Processor<Message> {
+abstract class AbstractMessageConsumer(private val componentName: String) : Sink<Message> {
 
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
     private var subscribed: Boolean = false
+
+    override fun setNextDestination(destinationName: String) {
+        this.nextDestinationName = destinationName
+    }
 
     override fun setEventBus(fluxProcessor: FluxProcessor<Message, Message>) {
         this.fluxProcessor = fluxProcessor
@@ -15,30 +19,18 @@ abstract class AbstractMessageProcessor(private val componentName: String) : Pro
         }
     }
 
-    override fun setNextDestination(destinationName: String) {
-        this.nextDestinationName = destinationName
-    }
-
-    override fun publishEvent(event: Message) {
-        fluxProcessor.onNext(event.apply { destination = nextDestinationName })
-    }
-
     override fun subscribeToEvents() {
         println("${getOwnDestination()} subscribes to eventBus ${fluxProcessor.hashCode()}")
         subscribed = true
         fluxProcessor.filter { it != null }
                 .filter { it.destination == getOwnDestination() }
                 .subscribe(
-                        this::processAndPublish, //onNext
-                        ::println              //onError
+                        ::consume, //onNext
+                        ::println  //onError
                 )
     }
 
-    private fun processAndPublish(message: Message) {
-        publishEvent(processInternal(message))
-    }
-
-    abstract fun processInternal(message: Message): Message
+    abstract fun consume(message: Message)
 
     override fun getOwnDestination() = componentName
 }
