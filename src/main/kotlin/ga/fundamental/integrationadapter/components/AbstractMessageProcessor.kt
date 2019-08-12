@@ -24,7 +24,6 @@ abstract class AbstractMessageProcessor(private val componentName: String) : Pro
     }
 
     override fun subscribeToEvents() {
-        println("${getOwnDestination()} subscribes to eventBus ${fluxProcessor.hashCode()}")
         subscribed = true
         fluxProcessor.filter { it != null }
                 .filter { it.destination == getOwnDestination() }

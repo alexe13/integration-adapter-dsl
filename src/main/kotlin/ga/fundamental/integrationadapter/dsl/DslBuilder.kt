@@ -5,7 +5,7 @@ import ga.fundamental.integrationadapter.components.ReactiveComponent
 import reactor.core.publisher.EmitterProcessor
 import reactor.core.publisher.FluxProcessor
 
-
+@RouterDslScope
 object Router {
     val pipelines: MutableMap<String, Pipeline> = HashMap()
 
@@ -15,6 +15,7 @@ object Router {
     }
 }
 
+@RouterDslScope
 class Pipelines {
     fun pipeline(name: String, init: Pipeline.() -> Unit) {
         val pipeline = Pipeline(name)
@@ -23,7 +24,7 @@ class Pipelines {
     }
 }
 
-
+@RouterDslScope
 class Pipeline(val name: String) {
     private var eventBus: FluxProcessor<Message, Message> = EmitterProcessor.create()
     internal val components: MutableList<Pair<ReactiveComponent<Message>, ReactiveComponent<Message>>> = ArrayList()
@@ -49,6 +50,7 @@ class Pipeline(val name: String) {
     }
 }
 
+@RouterDslScope
 class Component(private val pipeline: Pipeline) {
     fun link(pair: Pair<ReactiveComponent<Message>, ReactiveComponent<Message>>) {
         println("New link ${pair.first.getOwnDestination()} -> ${pair.second.getOwnDestination()}")
@@ -56,3 +58,9 @@ class Component(private val pipeline: Pipeline) {
         pipeline.components.add(pair)
     }
 }
+
+/**
+ * Controls DSL operator's scope to prohibit repeated outer receiver usage
+ **/
+@DslMarker
+annotation class RouterDslScope
