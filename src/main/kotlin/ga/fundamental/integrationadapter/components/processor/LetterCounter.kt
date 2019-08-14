@@ -1,6 +1,9 @@
-package ga.fundamental.integrationadapter.components
+package ga.fundamental.integrationadapter.components.processor
 
-class LetterCounter : AbstractMessageProcessor("letterCounter") {
+import ga.fundamental.integrationadapter.components.Message
+
+class LetterCounter : AbstractMessageProcessor() {
+    override fun getOwnDestination() = "LetterCounter#${hashCode()}"
 
     override fun processInternal(message: Message): Message {
         return message.copy(

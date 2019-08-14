@@ -1,8 +1,10 @@
-package ga.fundamental.integrationadapter.components
+package ga.fundamental.integrationadapter.components.processor
 
+import ga.fundamental.integrationadapter.components.Message
+import ga.fundamental.integrationadapter.components.Processor
 import reactor.core.publisher.FluxProcessor
 
-abstract class AbstractMessageProcessor(private val componentName: String) : Processor<Message> {
+abstract class AbstractMessageProcessor : Processor<Message> {
 
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
@@ -38,6 +40,4 @@ abstract class AbstractMessageProcessor(private val componentName: String) : Pro
     }
 
     abstract fun processInternal(message: Message): Message
-
-    override fun getOwnDestination() = componentName
 }

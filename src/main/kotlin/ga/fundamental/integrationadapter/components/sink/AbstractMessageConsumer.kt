@@ -1,8 +1,10 @@
-package ga.fundamental.integrationadapter.components
+package ga.fundamental.integrationadapter.components.sink
 
+import ga.fundamental.integrationadapter.components.Message
+import ga.fundamental.integrationadapter.components.Sink
 import reactor.core.publisher.FluxProcessor
 
-abstract class AbstractMessageConsumer(private val componentName: String) : Sink<Message> {
+abstract class AbstractMessageConsumer : Sink<Message> {
 
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
@@ -31,6 +33,4 @@ abstract class AbstractMessageConsumer(private val componentName: String) : Sink
     }
 
     abstract fun consume(message: Message)
-
-    override fun getOwnDestination() = componentName
 }

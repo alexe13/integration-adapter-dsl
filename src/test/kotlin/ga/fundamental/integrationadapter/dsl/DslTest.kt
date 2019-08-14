@@ -23,7 +23,7 @@ class DslTest {
             }
             pipeline("Some other processing pipeline") {
                 components {
-                    link(simpleMapper2 to letterCounter2)
+                    link(letterCounter to stdOutWriter)
                 }
             }
         }
