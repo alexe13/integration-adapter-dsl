@@ -1,23 +1,22 @@
 package ga.fundamental.integrationadapter
 
-import ga.fundamental.integrationadapter.components.*
+import ga.fundamental.integrationadapter.components.Message
 import ga.fundamental.integrationadapter.components.processor.LetterCounter
 import ga.fundamental.integrationadapter.components.processor.SimpleMapper
 import ga.fundamental.integrationadapter.components.sink.StdOutWriter
 import ga.fundamental.integrationadapter.components.source.RandomNumberGenerator
 import ga.fundamental.integrationadapter.components.source.StdOutReader
-import ga.fundamental.integrationadapter.dsl.Router
+import ga.fundamental.integrationadapter.dsl.*
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import reactor.core.publisher.ReplayProcessor
-import java.lang.RuntimeException
 
 @SpringBootApplication
 class IntegrationAdapterApplication
 
 val stdOutReader = StdOutReader()
 val simpleMapper = SimpleMapper {
-    when(val payloadNumber = it.payload as Int) {
+    when (val payloadNumber = it.payload as Int) {
         in 0..30 -> Message(it.id, "Pretty small number: $payloadNumber")
         in 30..60 -> Message(it.id, "Decent number: $payloadNumber")
         in 60..100 -> Message(it.id, "Big number: $payloadNumber")
@@ -44,7 +43,7 @@ fun main(args: Array<String>) {
         }
         pipeline("Generate random numbers") {
             components {
-                link(randomGenerator to simpleMapper)
+                link(randomGenerator to simpleMapper) `on condition that` { it.payload is Int && it.payload > 50 }
                 link(simpleMapper to stdOutWriter2)
             }
         }

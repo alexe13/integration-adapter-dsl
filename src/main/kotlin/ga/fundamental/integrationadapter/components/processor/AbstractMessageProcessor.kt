@@ -1,11 +1,15 @@
 package ga.fundamental.integrationadapter.components.processor
 
+import ga.fundamental.integrationadapter.components.ConditionalMessageSubscriber
 import ga.fundamental.integrationadapter.components.Message
 import ga.fundamental.integrationadapter.components.Processor
 import reactor.core.publisher.FluxProcessor
 
-abstract class AbstractMessageProcessor : Processor<Message> {
+abstract class AbstractMessageProcessor(var predicate: (Message) -> Boolean = { true }) : Processor<Message>, ConditionalMessageSubscriber {
 
+    override var condition: (Message) -> Boolean
+        get() = predicate
+        set(value) {predicate = value}
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
     private var subscribed: Boolean = false
@@ -28,6 +32,7 @@ abstract class AbstractMessageProcessor : Processor<Message> {
     override fun subscribeToEvents() {
         subscribed = true
         fluxProcessor.filter { it != null }
+                .filter(predicate)
                 .filter { it.destination == getOwnDestination() }
                 .subscribe(
                         this::processAndPublish, //onNext
