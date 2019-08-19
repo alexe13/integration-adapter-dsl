@@ -6,7 +6,7 @@ class StdOutWriter : AbstractMessageConsumer() {
     override fun getOwnDestination() = "StdOutWriter#${hashCode()}"
 
     override fun consume(message: Message) {
-        println("${getOwnDestination()} -> $message")
+        println("[${Thread.currentThread().name}] ${getOwnDestination()} -> $message")
     }
 
 }

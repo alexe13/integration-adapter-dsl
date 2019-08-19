@@ -1,15 +1,16 @@
 package ga.fundamental.integrationadapter.components.sink
 
-import ga.fundamental.integrationadapter.components.ConditionalMessageSubscriber
 import ga.fundamental.integrationadapter.components.Message
 import ga.fundamental.integrationadapter.components.Sink
+import ga.fundamental.integrationadapter.components.processor.AbstractMessageProcessor
+import org.slf4j.LoggerFactory
 import reactor.core.publisher.FluxProcessor
 
-abstract class AbstractMessageConsumer(private var predicate: (Message) -> Boolean = { true }) : Sink<Message>, ConditionalMessageSubscriber {
+abstract class AbstractMessageConsumer : Sink<Message> {
+    companion object {
+        private val log = LoggerFactory.getLogger(AbstractMessageProcessor::class.java)
+    }
 
-    override var condition: (Message) -> Boolean
-        get() = predicate
-        set(value) {predicate = value}
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
     private var subscribed: Boolean = false
@@ -19,8 +20,8 @@ abstract class AbstractMessageConsumer(private var predicate: (Message) -> Boole
     }
 
     override fun setEventBus(fluxProcessor: FluxProcessor<Message, Message>) {
-        this.fluxProcessor = fluxProcessor
         if (!subscribed) {
+            this.fluxProcessor = fluxProcessor
             subscribeToEvents()
         }
     }
@@ -28,11 +29,10 @@ abstract class AbstractMessageConsumer(private var predicate: (Message) -> Boole
     override fun subscribeToEvents() {
         subscribed = true
         fluxProcessor.filter { it != null }
-                .filter(predicate)
                 .filter { it.destination == getOwnDestination() }
                 .subscribe(
                         ::consume, //onNext
-                        ::println  //onError
+                        { log.error("", it) }  //onError
                 )
     }
 

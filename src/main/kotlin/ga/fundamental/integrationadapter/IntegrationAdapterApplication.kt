@@ -3,6 +3,8 @@ package ga.fundamental.integrationadapter
 import ga.fundamental.integrationadapter.components.Message
 import ga.fundamental.integrationadapter.components.processor.LetterCounter
 import ga.fundamental.integrationadapter.components.processor.SimpleMapper
+import ga.fundamental.integrationadapter.components.processor.splitter.ConditionalSplitter
+import ga.fundamental.integrationadapter.components.sink.StdErrWriter
 import ga.fundamental.integrationadapter.components.sink.StdOutWriter
 import ga.fundamental.integrationadapter.components.source.RandomNumberGenerator
 import ga.fundamental.integrationadapter.components.source.StdOutReader
@@ -23,9 +25,17 @@ val simpleMapper = SimpleMapper {
         else -> Message(it.id, "Huh?")
     }
 }
+val randomNumberSplitter = ConditionalSplitter {
+    when {
+        it.payload is Double && it.payload <= 100 -> stdOutWriter2
+        it.payload is Double && it.payload > 100 -> stdErrWriter
+        else -> throw IllegalArgumentException("Unexpected payload: ${it.payload}")
+    }
+}
 val letterCounter = LetterCounter()
 val stdOutWriter = StdOutWriter()
 val stdOutWriter2 = StdOutWriter()
+val stdErrWriter = StdErrWriter()
 val randomGenerator = RandomNumberGenerator()
 
 fun main(args: Array<String>) {
@@ -34,17 +44,19 @@ fun main(args: Array<String>) {
 
 
     Router {
-        pipeline("Count letters from console input") {
-            eventBus(replayProcessor)
-            components {
-                link(stdOutReader to letterCounter)
-                link(letterCounter to stdOutWriter)
-            }
-        }
+        //        pipeline("Count letters from console input") {
+//            eventBus(replayProcessor)
+//            components {
+//                link(stdOutReader to letterCounter)
+//                link(letterCounter to stdOutWriter)
+//            }
+//        }
         pipeline("Generate random numbers") {
             components {
-                link(randomGenerator to simpleMapper) `on condition that` { it.payload is Int && it.payload > 50 }
-                link(simpleMapper to stdOutWriter2)
+                link(randomGenerator to randomNumberSplitter)
+//                link(randomGenerator to stdOutWriter2) //normal flow
+//                link(randomGenerator to stdErrWriter) //handle invalid results
+//                link(simpleMapper to stdOutWriter2) //continue processing normal results
             }
         }
     }

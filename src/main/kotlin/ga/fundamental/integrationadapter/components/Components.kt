@@ -21,7 +21,3 @@ interface Sink<T> : ReactiveComponent<T> {
 }
 
 interface Processor<T> : Source<T>, Sink<T>
-
-interface ConditionalMessageSubscriber {
-    var condition: (Message) -> Boolean
-}
