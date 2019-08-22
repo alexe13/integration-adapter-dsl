@@ -9,10 +9,10 @@ class RandomNumberGenerator : AbstractMessageSupplier() {
     private val rand = Random()
 
     init {
-        Flux.interval(Duration.ofSeconds(3))
+        Flux.interval(Duration.ofSeconds(5))
                 .map { rand.nextInt(100) }
                 .map { ga.fundamental.integrationadapter.components.Message(System.currentTimeMillis().toString(), it * 1.2) } //TODO
-                .doOnNext { println("[${Thread.currentThread().name}] ${getOwnDestination()} -> ${it.payload}") }
+                .log("RandomNumberFlux")
                 .subscribe(::publishEvent, ::println)
     }
 

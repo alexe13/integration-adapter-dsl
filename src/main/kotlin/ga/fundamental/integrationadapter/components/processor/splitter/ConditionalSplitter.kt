@@ -26,7 +26,8 @@ class ConditionalSplitter(private val nextDestinationChooser: (Message) -> React
     override fun publishEvent(event: Message) {
         val nextComponent = nextDestinationChooser(event)
         nextComponent.setEventBus(fluxProcessor)
-        fluxProcessor.onNext(event.apply { destination = nextComponent.getOwnDestination() })
+        val event2 = event.copy(destination = nextComponent.getOwnDestination())
+        fluxProcessor.onNext(event2)
     }
 
     override fun subscribeToEvents() {

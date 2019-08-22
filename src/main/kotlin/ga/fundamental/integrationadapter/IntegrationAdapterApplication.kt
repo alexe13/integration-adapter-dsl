@@ -8,7 +8,7 @@ import ga.fundamental.integrationadapter.components.sink.StdErrWriter
 import ga.fundamental.integrationadapter.components.sink.StdOutWriter
 import ga.fundamental.integrationadapter.components.source.RandomNumberGenerator
 import ga.fundamental.integrationadapter.components.source.StdOutReader
-import ga.fundamental.integrationadapter.dsl.*
+import ga.fundamental.integrationadapter.dsl.Router
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import reactor.core.publisher.ReplayProcessor
@@ -40,7 +40,7 @@ val randomGenerator = RandomNumberGenerator()
 
 fun main(args: Array<String>) {
     runApplication<IntegrationAdapterApplication>(*args)
-    val replayProcessor = ReplayProcessor.create<Message>()
+    val replayProcessor = ReplayProcessor.create<Message>(1)
 
 
     Router {
@@ -52,6 +52,7 @@ fun main(args: Array<String>) {
 //            }
 //        }
         pipeline("Generate random numbers") {
+            eventBus(replayProcessor)
             components {
                 link(randomGenerator to randomNumberSplitter)
 //                link(randomGenerator to stdOutWriter2) //normal flow
