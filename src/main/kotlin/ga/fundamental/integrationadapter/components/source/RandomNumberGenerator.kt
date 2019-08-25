@@ -12,7 +12,6 @@ class RandomNumberGenerator : AbstractMessageSupplier() {
         Flux.interval(Duration.ofSeconds(5))
                 .map { rand.nextInt(100) }
                 .map { ga.fundamental.integrationadapter.components.Message(System.currentTimeMillis().toString(), it * 1.2) } //TODO
-                .log("RandomNumberFlux")
                 .subscribe(::publishEvent, ::println)
     }
 

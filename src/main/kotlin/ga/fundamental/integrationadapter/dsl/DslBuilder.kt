@@ -2,8 +2,8 @@ package ga.fundamental.integrationadapter.dsl
 
 import ga.fundamental.integrationadapter.components.Message
 import ga.fundamental.integrationadapter.components.ReactiveComponent
-import reactor.core.publisher.EmitterProcessor
 import reactor.core.publisher.FluxProcessor
+import reactor.core.publisher.ReplayProcessor
 
 @RouterDslScope
 object Router {
@@ -26,7 +26,7 @@ class Pipelines {
 
 @RouterDslScope
 class Pipeline(val name: String) {
-    private var eventBus: FluxProcessor<Message, Message> = EmitterProcessor.create()
+    private var eventBus: FluxProcessor<Message, Message> = ReplayProcessor.create(1)
     internal val components: MutableList<Link<ReactiveComponent<Message>>> = ArrayList()
 
     fun eventBus(eventBus: FluxProcessor<Message, Message>) {
