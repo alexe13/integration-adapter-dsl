@@ -9,9 +9,10 @@ import reactor.core.publisher.ReplayProcessor
 object Router {
     val pipelines: MutableMap<String, Pipeline> = HashMap()
 
-    operator fun invoke(init: Pipelines.() -> Unit) {
+    operator fun invoke(init: Pipelines.() -> Unit): Router {
         Pipelines().init()
         println("Pipelines: ${pipelines.keys}")
+        return this
     }
 }
 

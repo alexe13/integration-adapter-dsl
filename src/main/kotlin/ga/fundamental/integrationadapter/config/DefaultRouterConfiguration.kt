@@ -17,7 +17,7 @@ import reactor.core.publisher.ReplayProcessor
 class DefaultRouterConfiguration {
 
     @Bean
-    fun router() {
+    fun router(): Router {
         return Router {
             pipeline("Count letters from console input") {
                 components {
