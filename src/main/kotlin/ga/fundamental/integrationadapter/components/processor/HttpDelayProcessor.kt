@@ -14,7 +14,6 @@ class HttpDelayProcessor(delaySeconds: Int = 1) : AbstractAsyncMessageProcessor(
     override fun processAsync(message: Message) =
             httpClient.get().retrieve().bodyToMono<String>()
                     .map { Message(System.currentTimeMillis().toString(), it) }
-                    .log()
 
     override fun getOwnDestination() = "HttpDelayProcessor${hashCode()}"
 }

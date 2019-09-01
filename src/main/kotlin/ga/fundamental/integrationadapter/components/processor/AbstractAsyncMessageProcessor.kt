@@ -55,14 +55,11 @@ abstract class AbstractAsyncMessageProcessor: Processor<Message> {
         subscribed = true
         fluxProcessor.filter { it != null }
                 .filter { it.destination == getOwnDestination() }
+                .flatMap { processAsync(it) }
                 .subscribe(
-                        this::processAndPublish, //onNext
+                        this::publishEvent, //onNext
                         ::println              //onError
                 )
-    }
-
-    private fun processAndPublish(message: Message) {
-        processAsync(message).subscribe(messageSubscriber)
     }
 
     abstract fun processAsync(message: Message): Publisher<Message>
