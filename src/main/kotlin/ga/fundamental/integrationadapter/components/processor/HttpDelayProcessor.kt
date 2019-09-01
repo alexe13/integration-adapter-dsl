@@ -7,15 +7,14 @@ import org.springframework.web.reactive.function.client.bodyToMono
 /**
  * Simulates heavy network interactions
  */
-class HttpDelayProcessor(delaySeconds: Int = 1) : AbstractMessageProcessor() {
-
+class HttpDelayProcessor(delaySeconds: Int = 1) : AbstractAsyncMessageProcessor() {
     private val url = "https://postman-echo.com/delay/$delaySeconds"
     private val httpClient = WebClient.create(url)
 
-    override fun processInternal(message: Message): Message {
-        httpClient.get().retrieve().bodyToMono<String>().subscribe(::println, ::println)
-        return message
-    }
+    override fun processAsync(message: Message) =
+            httpClient.get().retrieve().bodyToMono<String>()
+                    .map { Message(System.currentTimeMillis().toString(), it) }
+                    .log()
 
     override fun getOwnDestination() = "HttpDelayProcessor${hashCode()}"
 }

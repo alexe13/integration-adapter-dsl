@@ -11,8 +11,10 @@ import ga.fundamental.integrationadapter.components.source.StdOutReader
 import ga.fundamental.integrationadapter.dsl.Router
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import reactor.core.publisher.ReplayProcessor
 
+@Profile("default")
 @Configuration
 class DefaultRouterConfiguration {
 
