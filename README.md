@@ -6,8 +6,7 @@ Uses Reactor 3 internally to link components together.
 
 Example of Builder DSL:
 ```kotlin    
-fun router(): Router { //pipelines are created in a Router singleton
-        return Router {
+Router { //pipelines are created in a Router singleton
             pipeline("Count letters from console input") { //pipeline name
                 components {
                     link(stdOutReader() to letterCounter()) //links two components together
