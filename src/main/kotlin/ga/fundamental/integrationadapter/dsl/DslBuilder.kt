@@ -27,7 +27,7 @@ class Pipelines {
 
 @RouterDslScope
 class Pipeline(val name: String) {
-    private var eventBus: FluxProcessor<Message, Message> = ReplayProcessor.create(1)
+    internal var eventBus: FluxProcessor<Message, Message> = ReplayProcessor.create(1)
     internal val components: MutableList<Link<ReactiveComponent<Message>>> = ArrayList()
 
     fun eventBus(eventBus: FluxProcessor<Message, Message>) {
