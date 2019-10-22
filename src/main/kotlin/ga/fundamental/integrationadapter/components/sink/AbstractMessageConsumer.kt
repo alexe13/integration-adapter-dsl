@@ -4,16 +4,20 @@ import ga.fundamental.integrationadapter.components.Message
 import ga.fundamental.integrationadapter.components.Sink
 import ga.fundamental.integrationadapter.components.processor.AbstractMessageProcessor
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.BeanNameAware
 import reactor.core.publisher.FluxProcessor
+import java.util.*
 
-abstract class AbstractMessageConsumer : Sink<Message> {
+abstract class AbstractMessageConsumer : Sink<Message>, BeanNameAware {
     companion object {
         private val log = LoggerFactory.getLogger(AbstractMessageProcessor::class.java)
     }
 
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
+    private lateinit var beanName: String
     private var subscribed: Boolean = false
+    private val ownId = UUID.randomUUID().toString()
 
     override fun setNextDestination(destinationName: String) {
         this.nextDestinationName = destinationName
@@ -26,6 +30,8 @@ abstract class AbstractMessageConsumer : Sink<Message> {
         }
     }
 
+    override fun getOwnDestination() = "$beanName($ownId)"
+
     override fun subscribeToEvents() {
         subscribed = true
         fluxProcessor.filter { it != null }
@@ -34,6 +40,10 @@ abstract class AbstractMessageConsumer : Sink<Message> {
                         ::consume, //onNext
                         { log.error("", it) }  //onError
                 )
+    }
+
+    override fun setBeanName(name: String) {
+        beanName = name
     }
 
     abstract fun consume(message: Message)

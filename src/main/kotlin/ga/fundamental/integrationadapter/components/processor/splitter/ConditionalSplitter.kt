@@ -4,13 +4,13 @@ import ga.fundamental.integrationadapter.components.Message
 import ga.fundamental.integrationadapter.components.Processor
 import ga.fundamental.integrationadapter.components.ReactiveComponent
 import reactor.core.publisher.FluxProcessor
+import java.util.*
 
 class ConditionalSplitter(private val nextDestinationChooser: (Message) -> ReactiveComponent<Message>) : Processor<Message> {
     private var subscribed = false
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
-
-    override fun getOwnDestination() = "ConditionalSplitter#${hashCode()}"
+    private val ownId = UUID.randomUUID().toString()
 
     override fun setNextDestination(destinationName: String) {
         this.nextDestinationName = destinationName
@@ -22,6 +22,8 @@ class ConditionalSplitter(private val nextDestinationChooser: (Message) -> React
             subscribeToEvents()
         }
     }
+
+    override fun getOwnDestination() = ownId
 
     override fun publishEvent(event: Message) {
         val nextComponent = nextDestinationChooser(event)

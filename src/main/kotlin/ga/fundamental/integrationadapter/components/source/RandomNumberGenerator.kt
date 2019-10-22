@@ -15,6 +15,4 @@ class RandomNumberGenerator : AbstractMessageSupplier() {
                 .subscribe(::publishEvent, ::println)
     }
 
-    override fun getOwnDestination() = "RandomNumberGenerator#${hashCode()}"
-
 }

@@ -3,38 +3,21 @@ package ga.fundamental.integrationadapter.components.processor
 import ga.fundamental.integrationadapter.components.Message
 import ga.fundamental.integrationadapter.components.Processor
 import org.reactivestreams.Publisher
-import org.reactivestreams.Subscriber
-import org.reactivestreams.Subscription
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.BeanNameAware
 import reactor.core.publisher.FluxProcessor
+import java.util.*
 
-abstract class AbstractAsyncMessageProcessor: Processor<Message> {
+abstract class AbstractAsyncMessageProcessor : Processor<Message>, BeanNameAware {
     companion object {
         private val log = LoggerFactory.getLogger(AbstractMessageProcessor::class.java)
     }
 
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
+    private lateinit var beanName: String
     private var subscribed: Boolean = false
-
-    private val messageSubscriber = object : Subscriber<Message> {
-        override fun onComplete() {
-
-        }
-
-        override fun onSubscribe(s: Subscription?) {
-
-        }
-
-        override fun onNext(message: Message?) {
-            message?.let { publishEvent(it) }
-        }
-
-        override fun onError(t: Throwable?) {
-            t?.let { log.error("", it) }
-        }
-
-    }
+    private val ownId = UUID.randomUUID().toString()
 
     override fun setEventBus(fluxProcessor: FluxProcessor<Message, Message>) {
         this.fluxProcessor = fluxProcessor
@@ -42,6 +25,8 @@ abstract class AbstractAsyncMessageProcessor: Processor<Message> {
             subscribeToEvents()
         }
     }
+
+    override fun getOwnDestination() = "$beanName($ownId)"
 
     override fun setNextDestination(destinationName: String) {
         this.nextDestinationName = destinationName
@@ -63,4 +48,8 @@ abstract class AbstractAsyncMessageProcessor: Processor<Message> {
     }
 
     abstract fun processAsync(message: Message): Publisher<Message>
+
+    override fun setBeanName(name: String) {
+        beanName = name
+    }
 }

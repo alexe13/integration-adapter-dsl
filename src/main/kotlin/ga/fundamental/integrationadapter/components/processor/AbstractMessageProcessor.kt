@@ -3,16 +3,20 @@ package ga.fundamental.integrationadapter.components.processor
 import ga.fundamental.integrationadapter.components.Message
 import ga.fundamental.integrationadapter.components.Processor
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.BeanNameAware
 import reactor.core.publisher.FluxProcessor
+import java.util.*
 
-abstract class AbstractMessageProcessor : Processor<Message> {
+abstract class AbstractMessageProcessor : Processor<Message>, BeanNameAware {
     companion object {
         private val log = LoggerFactory.getLogger(AbstractMessageProcessor::class.java)
     }
 
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
+    private lateinit var beanName: String
     private var subscribed: Boolean = false
+    private val ownId = UUID.randomUUID().toString()
 
     override fun setEventBus(fluxProcessor: FluxProcessor<Message, Message>) {
         this.fluxProcessor = fluxProcessor
@@ -20,6 +24,8 @@ abstract class AbstractMessageProcessor : Processor<Message> {
             subscribeToEvents()
         }
     }
+
+    override fun getOwnDestination() = "$beanName($ownId)"
 
     override fun setNextDestination(destinationName: String) {
         this.nextDestinationName = destinationName
@@ -41,6 +47,10 @@ abstract class AbstractMessageProcessor : Processor<Message> {
 
     private fun processAndPublish(message: Message) {
         publishEvent(processInternal(message))
+    }
+
+    override fun setBeanName(name: String) {
+        beanName = name
     }
 
     abstract fun processInternal(message: Message): Message

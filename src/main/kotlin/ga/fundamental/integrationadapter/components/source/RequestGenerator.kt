@@ -16,5 +16,4 @@ class RequestGenerator(requestFrequency: Duration) : AbstractMessageSupplier() {
                 .subscribe(::publishEvent, ::println)
     }
 
-    override fun getOwnDestination() = "RequestGenerator#${hashCode()}"
 }
