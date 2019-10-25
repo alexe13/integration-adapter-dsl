@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import reactor.core.publisher.ReplayProcessor
+import java.time.Duration
 
 @Profile("default")
 @Configuration
@@ -45,7 +46,7 @@ class DefaultRouterConfiguration {
 
     @Bean
     fun randomNumberMapper() = SimpleMapper {
-        when (val payloadNumber = it.payload as Double) {
+        when (val payloadNumber = it.payload as Int) {
             in 0..30 -> Message(it.id, "Pretty small number: $payloadNumber")
             in 30..60 -> Message(it.id, "Decent number: $payloadNumber")
             in 60..100 -> Message(it.id, "Big number: $payloadNumber")
@@ -56,8 +57,8 @@ class DefaultRouterConfiguration {
     @Bean
     fun randomNumberSplitter() = ConditionalSplitter {
         when {
-            it.payload is Double && it.payload <= 100 -> randomNumberMapper()
-            it.payload is Double && it.payload > 100 -> stdErrWriter()
+            it.payload is Int && it.payload <= 100 -> randomNumberMapper()
+            it.payload is Int && it.payload > 100 -> stdErrWriter()
             else -> throw IllegalArgumentException("Unexpected payload: ${it.payload}")
         }
     }
@@ -75,6 +76,6 @@ class DefaultRouterConfiguration {
     fun stdErrWriter() = StdErrWriter()
 
     @Bean
-    fun randomNumberGenerator() = RandomNumberGenerator()
+    fun randomNumberGenerator() = RandomNumberGenerator(Duration.ofSeconds(1))
 
 }

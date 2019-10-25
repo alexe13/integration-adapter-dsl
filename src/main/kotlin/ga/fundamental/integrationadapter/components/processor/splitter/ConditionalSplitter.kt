@@ -1,29 +1,10 @@
 package ga.fundamental.integrationadapter.components.processor.splitter
 
 import ga.fundamental.integrationadapter.components.Message
-import ga.fundamental.integrationadapter.components.Processor
 import ga.fundamental.integrationadapter.components.ReactiveComponent
-import reactor.core.publisher.FluxProcessor
-import java.util.*
+import ga.fundamental.integrationadapter.components.processor.AbstractMessageProcessor
 
-class ConditionalSplitter(private val nextDestinationChooser: (Message) -> ReactiveComponent<Message>) : Processor<Message> {
-    private var subscribed = false
-    private lateinit var fluxProcessor: FluxProcessor<Message, Message>
-    private lateinit var nextDestinationName: String
-    private val ownId = UUID.randomUUID().toString()
-
-    override fun setNextDestination(destinationName: String) {
-        this.nextDestinationName = destinationName
-    }
-
-    override fun setEventBus(fluxProcessor: FluxProcessor<Message, Message>) {
-        this.fluxProcessor = fluxProcessor
-        if (!subscribed) {
-            subscribeToEvents()
-        }
-    }
-
-    override fun getOwnDestination() = ownId
+class ConditionalSplitter(private val nextDestinationChooser: (Message) -> ReactiveComponent<Message>) : AbstractMessageProcessor() {
 
     override fun publishEvent(event: Message) {
         val nextComponent = nextDestinationChooser(event)
@@ -32,14 +13,6 @@ class ConditionalSplitter(private val nextDestinationChooser: (Message) -> React
         fluxProcessor.onNext(event2)
     }
 
-    override fun subscribeToEvents() {
-        subscribed = true
-        fluxProcessor.filter { it != null }
-                .filter { it.destination == getOwnDestination() }
-                .onErrorContinue { throwable, _ -> System.err.println(throwable) }
-                .subscribe(
-                        this::publishEvent,
-                        ::println
-                )
-    }
+    override fun processInternal(message: Message) = message //NO-OP
+
 }

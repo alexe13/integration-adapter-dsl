@@ -6,6 +6,7 @@ import ga.fundamental.integrationadapter.components.processor.AbstractMessagePro
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.BeanNameAware
 import reactor.core.publisher.FluxProcessor
+import reactor.core.scheduler.Schedulers
 import java.util.*
 
 abstract class AbstractMessageConsumer : Sink<Message>, BeanNameAware {
@@ -36,6 +37,7 @@ abstract class AbstractMessageConsumer : Sink<Message>, BeanNameAware {
         subscribed = true
         fluxProcessor.filter { it != null }
                 .filter { it.destination == getOwnDestination() }
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(
                         ::consume, //onNext
                         { log.error("", it) }  //onError

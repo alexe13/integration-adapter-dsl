@@ -2,17 +2,14 @@ package ga.fundamental.integrationadapter.components.processor
 
 import ga.fundamental.integrationadapter.components.Message
 import ga.fundamental.integrationadapter.components.Processor
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.BeanNameAware
 import reactor.core.publisher.FluxProcessor
+import reactor.core.scheduler.Schedulers
 import java.util.*
 
 abstract class AbstractMessageProcessor : Processor<Message>, BeanNameAware {
-    companion object {
-        private val log = LoggerFactory.getLogger(AbstractMessageProcessor::class.java)
-    }
 
-    private lateinit var fluxProcessor: FluxProcessor<Message, Message>
+    protected lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
     private lateinit var beanName: String
     private var subscribed: Boolean = false
@@ -39,6 +36,8 @@ abstract class AbstractMessageProcessor : Processor<Message>, BeanNameAware {
         subscribed = true
         fluxProcessor.filter { it != null }
                 .filter { it.destination == getOwnDestination() }
+                .onErrorContinue { throwable, _ -> System.err.println(throwable) }
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(
                         this::processAndPublish, //onNext
                         ::println              //onError

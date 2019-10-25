@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import reactor.core.publisher.ReplayProcessor
+import java.time.Duration
 
 @Profile("deadLetterQueue")
 @Configuration
@@ -38,7 +39,7 @@ class DeadLetterQueueRouterConfiguration {
     }
 
     @Bean
-    fun randomNumberGenerator() = RandomNumberGenerator()
+    fun randomNumberGenerator() = RandomNumberGenerator(Duration.ofSeconds(5))
 
     @Bean
     fun randomNumberSplitter() = ConditionalSplitter {

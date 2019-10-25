@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import reactor.core.publisher.ReplayProcessor
+import java.time.Duration
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DslTest {
@@ -19,13 +20,13 @@ class DslTest {
     private val reader1 = StdOutReader().apply { setBeanName("StdOutReader") }
     private val mapper1 = SimpleMapper { it }.apply { setBeanName("SimpleMapper") }
     private val writer1 = StdOutWriter().apply { setBeanName("StdOutWriter") }
-    private val numberGenerator = RandomNumberGenerator().apply { setBeanName("RandomNumberGenerator") }
+    private val numberGenerator = RandomNumberGenerator(Duration.ofSeconds(5)).apply { setBeanName("RandomNumberGenerator") }
     private val splitter = ConditionalSplitter {
         when {
             it.payload is Number -> okWriter
             else -> errWriter
         }
-    }
+    }.apply { setBeanName("Splitter") }
     private val okWriter = StdOutWriter().apply { setBeanName("OkWriter") }
     private val errWriter = StdErrWriter().apply { setBeanName("ErrWriter") }
 

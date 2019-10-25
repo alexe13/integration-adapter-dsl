@@ -6,6 +6,7 @@ import org.reactivestreams.Publisher
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.BeanNameAware
 import reactor.core.publisher.FluxProcessor
+import reactor.core.scheduler.Schedulers
 import java.util.*
 
 abstract class AbstractAsyncMessageProcessor : Processor<Message>, BeanNameAware {
@@ -41,6 +42,7 @@ abstract class AbstractAsyncMessageProcessor : Processor<Message>, BeanNameAware
         fluxProcessor.filter { it != null }
                 .filter { it.destination == getOwnDestination() }
                 .flatMap { processAsync(it) }
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(
                         this::publishEvent, //onNext
                         ::println              //onError
