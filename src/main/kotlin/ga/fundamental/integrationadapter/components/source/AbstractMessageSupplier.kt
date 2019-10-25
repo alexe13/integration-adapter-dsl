@@ -9,7 +9,7 @@ import java.util.*
 abstract class AbstractMessageSupplier : Source<Message>, BeanNameAware {
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
-    private lateinit var beanName: String
+    private var beanName: String = javaClass.simpleName
     private val ownId = UUID.randomUUID().toString()
 
     override fun setNextDestination(destinationName: String) {

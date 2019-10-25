@@ -16,7 +16,7 @@ abstract class AbstractAsyncMessageProcessor : Processor<Message>, BeanNameAware
 
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
-    private lateinit var beanName: String
+    private var beanName: String = javaClass.simpleName
     private var subscribed: Boolean = false
     private val ownId = UUID.randomUUID().toString()
 

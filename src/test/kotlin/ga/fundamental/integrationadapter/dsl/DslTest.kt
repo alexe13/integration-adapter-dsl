@@ -8,6 +8,7 @@ import ga.fundamental.integrationadapter.components.sink.StdOutWriter
 import ga.fundamental.integrationadapter.components.source.RandomNumberGenerator
 import ga.fundamental.integrationadapter.components.source.StdOutReader
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -17,18 +18,18 @@ import java.time.Duration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DslTest {
     private val replayProcessor = ReplayProcessor.create<Message>()
-    private val reader1 = StdOutReader().apply { setBeanName("StdOutReader") }
-    private val mapper1 = SimpleMapper { it }.apply { setBeanName("SimpleMapper") }
-    private val writer1 = StdOutWriter().apply { setBeanName("StdOutWriter") }
-    private val numberGenerator = RandomNumberGenerator(Duration.ofSeconds(5)).apply { setBeanName("RandomNumberGenerator") }
+    private val reader1 = StdOutReader()
+    private val mapper1 = SimpleMapper { it }
+    private val writer1 = StdOutWriter()
+    private val numberGenerator = RandomNumberGenerator(Duration.ofSeconds(5))
     private val splitter = ConditionalSplitter {
         when {
             it.payload is Number -> okWriter
             else -> errWriter
         }
-    }.apply { setBeanName("Splitter") }
-    private val okWriter = StdOutWriter().apply { setBeanName("OkWriter") }
-    private val errWriter = StdErrWriter().apply { setBeanName("ErrWriter") }
+    }
+    private val okWriter = StdOutWriter()
+    private val errWriter = StdErrWriter()
 
     private lateinit var router: Router
 
@@ -50,6 +51,10 @@ class DslTest {
         }
     }
 
+    @AfterAll
+    private fun cleanUp() {
+        router.destroy()
+    }
 
     @Test
     fun `verify basic structure`() {

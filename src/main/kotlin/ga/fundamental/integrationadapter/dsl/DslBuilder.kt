@@ -70,3 +70,7 @@ data class Link<T>(val pair: Pair<T, T>)
  **/
 @DslMarker
 annotation class RouterDslScope
+
+fun Router.destroy() {
+    this.pipelines.clear()
+}
