@@ -4,6 +4,8 @@ import ga.fundamental.integrationadapter.components.Message
 import ga.fundamental.integrationadapter.components.ReactiveComponent
 import reactor.core.publisher.FluxProcessor
 import reactor.core.publisher.ReplayProcessor
+import reactor.core.scheduler.Scheduler
+import reactor.core.scheduler.Schedulers
 
 @RouterDslScope
 object Router {
@@ -29,9 +31,14 @@ class Pipelines {
 class Pipeline(val name: String) {
     internal var eventBus: FluxProcessor<Message, Message> = ReplayProcessor.create(1)
     internal val components: MutableList<Link<ReactiveComponent<Message>>> = ArrayList()
+    internal var scheduler: Scheduler = Schedulers.single()
 
     fun eventBus(eventBus: FluxProcessor<Message, Message>) {
         this.eventBus = eventBus
+    }
+
+    fun scheduler(scheduler: Scheduler) {
+        this.scheduler = scheduler
     }
 
     fun components(init: Component.() -> Unit) {
@@ -40,6 +47,7 @@ class Pipeline(val name: String) {
         components.map { link ->
             link.pair.toList().map {
                 it.apply { setEventBus(eventBus) }
+                it.apply { setScheduler(scheduler) }
             }
         }
         println("Created new pipeline: $name, eventBus: $eventBus#${eventBus.hashCode()}")

@@ -6,6 +6,7 @@ import ga.fundamental.integrationadapter.components.processor.AbstractMessagePro
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.BeanNameAware
 import reactor.core.publisher.FluxProcessor
+import reactor.core.scheduler.Scheduler
 import reactor.core.scheduler.Schedulers
 import java.util.*
 
@@ -16,12 +17,17 @@ abstract class AbstractMessageConsumer : Sink<Message>, BeanNameAware {
 
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
+    private var scheduler: Scheduler = Schedulers.single()
     private var beanName: String = javaClass.simpleName
     private var subscribed: Boolean = false
     private val ownId = UUID.randomUUID().toString()
 
     override fun setNextDestination(destinationName: String) {
         this.nextDestinationName = destinationName
+    }
+
+    override fun setScheduler(scheduler: Scheduler) {
+        this.scheduler = scheduler
     }
 
     override fun setEventBus(fluxProcessor: FluxProcessor<Message, Message>) {
@@ -37,7 +43,7 @@ abstract class AbstractMessageConsumer : Sink<Message>, BeanNameAware {
         subscribed = true
         fluxProcessor.filter { it != null }
                 .filter { it.destination == getOwnDestination() }
-                .subscribeOn(Schedulers.boundedElastic())
+                .subscribeOn(scheduler)
                 .subscribe(
                         ::consume, //onNext
                         { log.error("", it) }  //onError

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import reactor.core.publisher.ReplayProcessor
+import reactor.core.scheduler.Schedulers
 import java.time.Duration
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -44,6 +45,7 @@ class DslTest {
                 }
             }
             pipeline("Pipeline2") {
+                scheduler(Schedulers.boundedElastic())
                 components {
                     link(numberGenerator to splitter)
                 }
@@ -69,6 +71,7 @@ class DslTest {
         val pipeline1 = router.pipelines["Pipeline1"]
         assertThat(pipeline1).extracting { it?.eventBus }.isInstanceOf(ReplayProcessor::class.java)
         assertThat(pipeline1).extracting { it?.eventBus }.isSameAs(replayProcessor)
+        assertThat(pipeline1).extracting { it?.scheduler }.isSameAs(Schedulers.single())
         val components1 = pipeline1?.components
         assertThat(components1).hasSize(2)
         assertThat(components1?.flatMap { it.pair.toList() }).containsAll(listOf(reader1, mapper1, writer1))
@@ -79,6 +82,7 @@ class DslTest {
         val pipeline2 = router.pipelines["Pipeline2"]
         assertThat(pipeline2).extracting { it?.eventBus }.isInstanceOf(ReplayProcessor::class.java)
         assertThat(pipeline2).extracting { it?.eventBus }.isNotSameAs(replayProcessor)
+        assertThat(pipeline2).extracting { it?.scheduler }.isSameAs(Schedulers.boundedElastic())
         val components2 = pipeline2?.components
         assertThat(components2).hasSize(1)
         assertThat(components2?.flatMap { it.pair.toList() }).containsAll(listOf(numberGenerator, splitter))

@@ -1,6 +1,7 @@
 package ga.fundamental.integrationadapter.components
 
 import reactor.core.publisher.FluxProcessor
+import reactor.core.scheduler.Scheduler
 
 
 interface Component {
@@ -9,6 +10,7 @@ interface Component {
 }
 
 interface ReactiveComponent<T> : Component {
+    fun setScheduler(scheduler: Scheduler)
     fun setEventBus(fluxProcessor: FluxProcessor<T, T>)
 }
 

@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import reactor.core.publisher.ReplayProcessor
+import reactor.core.scheduler.Schedulers
 import java.time.Duration
 
 @Profile("default")
@@ -30,6 +31,7 @@ class DefaultRouterConfiguration {
             }
             pipeline("Generate random numbers") {
                 eventBus(randomNumbersPipelineEventBus())
+                scheduler(Schedulers.boundedElastic())
                 components {
                     link(randomNumberGenerator() to randomNumberSplitter())
                     link(randomNumberMapper() to stdOutWriter2())
