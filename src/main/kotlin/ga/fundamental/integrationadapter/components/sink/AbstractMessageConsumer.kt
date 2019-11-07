@@ -17,7 +17,7 @@ abstract class AbstractMessageConsumer : Sink<Message>, BeanNameAware {
 
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
-    private var scheduler: Scheduler = Schedulers.single()
+    private var scheduler: Scheduler = Schedulers.immediate()
     private var beanName: String = javaClass.simpleName
     private var subscribed: Boolean = false
     private val ownId = UUID.randomUUID().toString()

@@ -11,7 +11,7 @@ import java.util.*
 abstract class AbstractMessageSupplier : Source<Message>, BeanNameAware {
     private lateinit var fluxProcessor: FluxProcessor<Message, Message>
     private lateinit var nextDestinationName: String
-    private var scheduler: Scheduler = Schedulers.single()
+    private var scheduler: Scheduler = Schedulers.immediate()
     private var beanName: String = javaClass.simpleName
     private val ownId = UUID.randomUUID().toString()
 

@@ -6,6 +6,7 @@ plugins {
     id("io.spring.dependency-management") version "1.0.7.RELEASE"
     kotlin("jvm") version "1.3.41"
     kotlin("plugin.spring") version "1.3.41"
+    id("com.adarshr.test-logger") version "2.0.0"
 }
 
 group = "ga.fundamental"
