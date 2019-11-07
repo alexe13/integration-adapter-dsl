@@ -43,6 +43,7 @@ abstract class AbstractMessageConsumer : Sink<Message>, BeanNameAware {
         subscribed = true
         fluxProcessor.filter { it != null }
                 .filter { it.destination == getOwnDestination() }
+                .onErrorContinue { throwable, _ -> System.err.println(throwable) }
                 .subscribeOn(scheduler)
                 .subscribe(
                         ::consume, //onNext

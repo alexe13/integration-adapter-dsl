@@ -4,7 +4,7 @@ import reactor.core.publisher.Flux
 import java.time.Duration
 import java.util.*
 
-class RandomNumberGenerator(emissionFrequency: Duration) : AbstractMessageSupplier() {
+class RandomNumberGenerator(emissionFrequency: Duration = Duration.ofSeconds(5)) : AbstractMessageSupplier() {
 
     private val rand = Random()
 

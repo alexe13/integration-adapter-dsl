@@ -46,12 +46,14 @@ abstract class AbstractMessageProcessor : Processor<Message>, BeanNameAware {
                 .subscribeOn(scheduler)
                 .subscribe(
                         this::processAndPublish, //onNext
-                        ::println              //onError
+                        { System.err.println(it) }             //onError
                 )
     }
 
     private fun processAndPublish(message: Message) {
-        publishEvent(processInternal(message))
+        kotlin.runCatching { processInternal(message) }
+                .onSuccess { publishEvent(it) }
+                .onFailure { System.err.println(it) }
     }
 
     override fun setBeanName(name: String) {
