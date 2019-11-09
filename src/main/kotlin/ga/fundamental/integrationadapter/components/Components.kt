@@ -39,10 +39,14 @@ interface ReactiveComponent<T> : BaseComponent {
     fun setEventBus(fluxProcessor: FluxProcessor<T, T>)
 }
 
+interface CanPushEvents<T>: ReactiveComponent<T>
+
+interface CanConsumeEvents<T>: ReactiveComponent<T>
+
 /**
  * Source of events
  */
-interface Source<T> : ReactiveComponent<T> {
+interface Source<T> : CanPushEvents<T> {
     /**
      * Component is required to publish events to its own event bus
      */
@@ -52,7 +56,7 @@ interface Source<T> : ReactiveComponent<T> {
 /**
  * Consumer of events
  */
-interface Sink<T> : ReactiveComponent<T> {
+interface Sink<T> : CanConsumeEvents<T> {
     /**
      * Component is required to subscribe to its own event bus
      */

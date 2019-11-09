@@ -1,7 +1,8 @@
 package ga.fundamental.integrationadapter.dsl
 
+import ga.fundamental.integrationadapter.components.CanConsumeEvents
+import ga.fundamental.integrationadapter.components.CanPushEvents
 import ga.fundamental.integrationadapter.components.Message
-import ga.fundamental.integrationadapter.components.ReactiveComponent
 import reactor.core.publisher.FluxProcessor
 import reactor.core.publisher.ReplayProcessor
 import reactor.core.scheduler.Scheduler
@@ -30,7 +31,7 @@ class Pipelines {
 @RouterDslScope
 class Pipeline(val name: String) {
     internal var eventBus: FluxProcessor<Message, Message> = ReplayProcessor.create(1)
-    internal val components: MutableList<Link<ReactiveComponent<Message>>> = ArrayList()
+    internal val components: MutableList<Link<CanPushEvents<Message>, CanConsumeEvents<Message>>> = ArrayList()
     internal var scheduler: Scheduler = Schedulers.single()
 
     fun eventBus(eventBus: FluxProcessor<Message, Message>) {
@@ -61,7 +62,7 @@ class Pipeline(val name: String) {
 
 @RouterDslScope
 class Component(private val pipeline: Pipeline) {
-    fun link(pair: Pair<ReactiveComponent<Message>, ReactiveComponent<Message>>): Link<ReactiveComponent<Message>> {
+    fun link(pair: Pair<CanPushEvents<Message>, CanConsumeEvents<Message>>): Link<CanPushEvents<Message>, CanConsumeEvents<Message>> {
         pair.first.setNextDestination(pair.second.getOwnDestination())
         val link = Link(pair)
         pipeline.components.add(link)
@@ -71,7 +72,7 @@ class Component(private val pipeline: Pipeline) {
 }
 
 @RouterDslScope
-data class Link<T>(val pair: Pair<T, T>)
+data class Link<F : CanPushEvents<*>, S : CanConsumeEvents<*>>(val pair: Pair<F, S>)
 
 /**
  * Controls DSL operator's scope to prohibit repeated outer receiver usage
