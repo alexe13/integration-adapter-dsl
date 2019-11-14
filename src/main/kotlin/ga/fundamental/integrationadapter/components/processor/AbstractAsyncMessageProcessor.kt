@@ -40,7 +40,7 @@ abstract class AbstractAsyncMessageProcessor : Processor<Message>, BeanNameAware
     }
 
     override fun publishEvent(event: Message) {
-        fluxProcessor.onNext(event.apply { destination = nextDestinationName })
+        fluxProcessor.onNext(event.copy(destination = nextDestinationName))
     }
 
     override fun subscribeToEvents() {

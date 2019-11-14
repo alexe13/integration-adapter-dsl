@@ -28,7 +28,7 @@ abstract class AbstractMessageSupplier : Source<Message>, BeanNameAware {
     }
 
     override fun publishEvent(event: Message) {
-        fluxProcessor.onNext(event.apply { destination = nextDestinationName })
+        fluxProcessor.onNext(event.copy(destination = nextDestinationName))
     }
 
     override fun getOwnDestination() = "$beanName($ownId)"

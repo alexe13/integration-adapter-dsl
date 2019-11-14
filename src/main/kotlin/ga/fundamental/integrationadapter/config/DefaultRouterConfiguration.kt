@@ -58,11 +58,8 @@ class DefaultRouterConfiguration {
 
     @Bean
     fun randomNumberSplitter() = ConditionalSplitter {
-        when {
-            it.payload is Int && it.payload <= 100 -> randomNumberMapper()
-            it.payload is Int && it.payload > 100 -> stdErrWriter()
-            else -> throw IllegalArgumentException("Unexpected payload: ${it.payload}")
-        }
+        { m: Message -> m.payload is Double && m.payload <= 100 } > stdOutWriter();
+        { m: Message -> m.payload is Double && m.payload > 100 } > stdErrWriter()
     }
 
     @Bean

@@ -23,14 +23,12 @@ class DslTest {
     private val mapper1 = SimpleMapper { it }
     private val writer1 = StdOutWriter()
     private val numberGenerator = RandomNumberGenerator(Duration.ofSeconds(5))
-    private val splitter = ConditionalSplitter {
-        when {
-            it.payload is Number -> okWriter
-            else -> errWriter
-        }
-    }
     private val okWriter = StdOutWriter()
     private val errWriter = StdErrWriter()
+    private val splitter = ConditionalSplitter {
+        { m: Message -> m.payload is Number } > okWriter
+        { m: Message -> m.payload !is Number } > errWriter
+    }
 
     private lateinit var router: Router
 

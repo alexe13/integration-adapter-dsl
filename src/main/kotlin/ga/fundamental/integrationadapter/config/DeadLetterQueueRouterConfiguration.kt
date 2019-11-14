@@ -43,11 +43,8 @@ class DeadLetterQueueRouterConfiguration {
 
     @Bean
     fun randomNumberSplitter() = ConditionalSplitter {
-        when {
-            it.payload is Double && it.payload <= 100 -> stdOutWriter()
-            it.payload is Double && it.payload > 100 -> errorAccumulator()
-            else -> throw IllegalArgumentException("Unexpected payload: ${it.payload}")
-        }
+        { m : Message -> m.payload is Double && m.payload <= 100 } > stdOutWriter();
+        { m : Message -> m.payload is Double && m.payload > 100 } > errorAccumulator()
     }
 
     @Bean
