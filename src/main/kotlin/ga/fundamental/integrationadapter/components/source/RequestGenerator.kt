@@ -2,17 +2,15 @@ package ga.fundamental.integrationadapter.components.source
 
 import ga.fundamental.integrationadapter.components.Message
 import reactor.core.publisher.Flux
-import java.time.Duration
 import java.util.concurrent.atomic.AtomicLong
 
-class RequestGenerator(requestFrequency: Duration) : AbstractMessageSupplier() {
+class RequestGenerator(val requestAmount: Int) : AbstractMessageSupplier() {
 
     private val requestNumber = AtomicLong()
 
-    init {
-        Flux.interval(requestFrequency)
-                .map { Message(System.nanoTime().toString(), requestNumber.incrementAndGet().toString()) }
-                .log("RequestGenerator")
+    fun start() {
+        Flux.range(0, requestAmount)
+                .map { Message(System.nanoTime().toString(), requestNumber.incrementAndGet()) }
                 .subscribe(::publishEvent, ::println)
     }
 

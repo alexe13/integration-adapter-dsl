@@ -4,6 +4,31 @@ import reactor.core.publisher.FluxProcessor
 import reactor.core.scheduler.Scheduler
 
 
+interface Actor<T> {
+    /**
+     * Return number of pending messages in actor's mailbox
+     */
+    fun pendingSize(): Int
+
+    /**
+     * Adds actors([Actor]) that this actor will send messages to
+     */
+    fun addRecipients(vararg actors: Actor<T>)
+
+    /**
+     * Send message to this [Actor]
+     */
+    fun send(message: T)
+
+    /**
+     * Return name of this [Actor]
+     */
+    fun getName(): String
+}
+
+
+
+//-------------------------- reactive ---------------------
 /**
  * Basic router component
  */

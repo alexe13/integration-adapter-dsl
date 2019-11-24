@@ -26,7 +26,7 @@ class BenchmarkRouterConfiguration {
     }
 
     @Bean
-    fun requestGenerator() = RequestGenerator(Duration.ofMillis(200))
+    fun requestGenerator() = RequestGenerator(100)
 
     @Bean
     fun httpDelayProcessor() = HttpDelayProcessor(2)
