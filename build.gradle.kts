@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import kotlin.collections.listOf
 
 plugins {
     maven
@@ -7,6 +8,7 @@ plugins {
     kotlin("jvm") version "1.3.41"
     kotlin("plugin.spring") version "1.3.41"
     id("com.adarshr.test-logger") version "2.0.0"
+    id("me.champeau.gradle.jmh") version "0.5.1"
 }
 
 group = "ga.fundamental"
@@ -19,6 +21,11 @@ repositories {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+jmh {
+    duplicateClassesStrategy = DuplicatesStrategy.WARN
+    profilers = listOf("hs_gc")
 }
 
 dependencies {
